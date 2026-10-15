@@ -66,8 +66,9 @@ Each buyback wraps SOL in the treasury's wSOL account (`Ef4Bu9…`), swaps it on
   board account and aren't counted.
 - Individual Deploy transactions aren't pulled, so there's no unique-miner count across rounds.
 - USD uses one daily SOL close.
-- ORE Reserve liquidity positions also bury ORE. A probe of the stake treasury account found no BuryEvents
-  without a SOL swap so far; if they show up, they need a separate source.
+- ORE says its Reserve's liquidity positions also bury ORE. `scripts/probe_bury.py` read every BuryEvent the
+  stake treasury account has seen since June 2026 (10,993): none came without a SOL swap, so the buyback pull
+  isn't missing burns.
 
 ## Running it
 

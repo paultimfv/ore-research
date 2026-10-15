@@ -34,7 +34,7 @@ function Exhibit({ id, n, title, children, note, source }: {
 }) {
   return (
     <section id={id} className="scroll-mt-20 border-t border-line pt-8 pb-14">
-      <div className="grid gap-x-10 gap-y-4 lg:grid-cols-[220px_1fr]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-x-10 gap-y-4 lg:grid-cols-[220px_minmax(0,1fr)]">
         <div className="text-[13px] leading-relaxed text-ash">
           <div className="mb-2 text-copper">Exhibit {n}</div>
           {note}
@@ -77,7 +77,7 @@ export default function Page() {
       </header>
 
       <main id="top" className="mx-auto max-w-[1200px] px-4 sm:px-6">
-        <section className="grid items-center gap-8 pt-12 pb-16 lg:grid-cols-[1.05fr_1fr] lg:pt-16">
+        <section className="grid grid-cols-[minmax(0,1fr)] items-center gap-8 pt-12 pb-16 lg:grid-cols-[1.05fr_1fr] lg:pt-16">
           <div>
             <h1 className="wide-xl text-[40px] font-bold text-bone sm:text-[56px]">
               {compact(T.deployedSol, 2)} SOL deployed on a 5×5 grid, one minute at a time.
@@ -179,7 +179,7 @@ export default function Page() {
           title="Every tile wins about as often as chance says it should"
           note={<>Each cell counts the rounds that tile won since round {n0(data.firstRound.id)}. With {n0(expected * 25)} rounds the expected count per tile is {n0(expected)}. A chi-tile test gives {data.squaresChi2} on 24 degrees of freedom, below the 36.4 threshold for 5% significance, so the spread is consistent with a fair draw.</>}
           source={<>ResetEvent winning_square, rounds with SOL deployed and valid entropy.</>}>
-          <div className="grid gap-8 sm:grid-cols-[minmax(0,420px)_1fr]">
+          <div className="grid grid-cols-[minmax(0,1fr)] gap-8 sm:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
             <div className="grid grid-cols-5 gap-1.5">
               {data.squares.map((w, i) => {
                 const dev = (w - expected) / expected;
