@@ -1,57 +1,31 @@
 @import "tailwindcss";
 
-/* ORE research terminal. Copper always means ORE, steel always means SOL. */
 :root {
-  --ink: #0b0a0e;
-  --panel: #131118;
-  --raise: #1b1820;
-  --line: #2a2630;
-  --bone: #ece6dc;
-  --ash: #8d8693;
-  --copper: #d4894a;
-  --copper-hi: #f0b27a;
-  --copper-lo: #7c4522;
-  --steel: #8ea6be;
-  --steel-lo: #3c4d5f;
-  --burn: #e2603a;
+  --bg: #0f1115;
+  --panel: #161a21;
+  --raise: #222833;
+  --line: #2a303b;
+  --text: #e8e9ec;
+  --muted: #9aa1ad;
+  --accent: #e0914f;  /* ORE */
+  --accent2: #7fa7d6; /* SOL */
+  --bad: #e36a4f;
 }
 
 @theme inline {
-  --color-ink: var(--ink);
+  --color-bg: var(--bg);
   --color-panel: var(--panel);
   --color-raise: var(--raise);
   --color-line: var(--line);
-  --color-bone: var(--bone);
-  --color-ash: var(--ash);
-  --color-copper: var(--copper);
-  --color-copper-hi: var(--copper-hi);
-  --color-copper-lo: var(--copper-lo);
-  --color-steel: var(--steel);
-  --color-burn: var(--burn);
-  --font-sans: var(--font-archivo);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent2: var(--accent2);
+  --font-sans: var(--font-inter);
 }
 
-html { background: var(--ink); color-scheme: dark; }
-body {
-  background: var(--ink);
-  color: var(--bone);
-  font-family: var(--font-archivo), system-ui, sans-serif;
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum";
-}
-
-/* the extended cut of Archivo echoes ORE's wordmark; used for display and figures only */
-.wide { font-stretch: 125%; letter-spacing: -0.01em; }
-.wide-xl { font-stretch: 125%; letter-spacing: -0.025em; line-height: 0.95; }
-
-a { text-decoration-color: color-mix(in oklab, var(--copper) 45%, transparent); text-underline-offset: 3px; }
-a:hover { text-decoration-color: var(--copper); }
-:focus-visible { outline: 2px solid var(--copper); outline-offset: 2px; border-radius: 2px; }
-::selection { background: var(--copper-lo); color: var(--bone); }
-
+html { background: var(--bg); color-scheme: dark; }
+body { background: var(--bg); color: var(--text); font-family: var(--font-inter), system-ui, sans-serif; font-variant-numeric: tabular-nums; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .recharts-tooltip-wrapper { outline: none; }
-.recharts-cartesian-axis-tick-value { font-variant-numeric: tabular-nums; }
-
-@keyframes draw { from { stroke-dashoffset: var(--len); } to { stroke-dashoffset: 0; } }
-.spiral-tick { stroke-dasharray: var(--len); animation: draw 1.4s cubic-bezier(.2,.7,.2,1) both; animation-delay: var(--delay); }
-@media (prefers-reduced-motion: reduce) { .spiral-tick { animation: none; } }
+details > summary { cursor: pointer; }
