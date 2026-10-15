@@ -1,5 +1,6 @@
 import data from "@/data/ore.json";
 import { TimeChart } from "@/components/charts";
+import Spiral from "@/components/spiral";
 import { AddressTable, FlowMap, Kpi, Panel, Section, Steps } from "@/components/ui";
 import { n0, pct, usd, compact, dayLabel } from "@/lib/fmt";
 
@@ -25,12 +26,16 @@ const ADDRESSES = [
 export default function Page() {
   return (
     <main className="mx-auto max-w-[1100px] px-4 py-8 sm:px-6">
-      <header className="flex flex-wrap items-end justify-between gap-2 border-b border-line pb-5">
+      <header className="flex items-center justify-between gap-4 border-b border-line pb-5">
         <div>
           <h1 className="text-[26px] font-semibold text-text">ORE dashboard</h1>
-          <p className="mt-1 text-[14.5px] text-muted">A Solana mining game: miners deploy SOL each minute, the protocol keeps a fee and uses it to buy back and burn ORE.</p>
+          <p className="mt-1 max-w-[60ch] text-[14.5px] text-muted">A Solana mining game: miners deploy SOL each minute, the protocol keeps a fee and uses it to buy back and burn ORE.</p>
+          <p className="mt-2 text-[13px] text-muted">Data through {dayLabel(data.lastRound.date)}</p>
         </div>
-        <p className="text-[13px] text-muted">Data through {dayLabel(data.lastRound.date)}</p>
+        <figure className="hidden shrink-0 text-center sm:block" title="Each tick is one day of mining since Oct 2025, oldest at the centre. Longer tick = more SOL deployed.">
+          <Spiral days={daily.map((d) => ({ d: d.d, deployed: d.deployed }))} size={130} />
+          <figcaption className="text-[11px] text-muted">one tick per day of mining</figcaption>
+        </figure>
       </header>
 
       <Section title="Key numbers">
