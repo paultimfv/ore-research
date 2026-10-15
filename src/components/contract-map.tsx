@@ -12,7 +12,7 @@ const BOXES: Box[] = [
   { id: "crank", x: 20, y: 160, w: 190, h: 64, title: "Reset crank", addr: "", kind: "wallet", lines: ["permissionless, once a minute"] },
   { id: "bury", x: 20, y: 280, w: 190, h: 64, title: "Bury authority", addr: "HNWhK5f8RMWBqcA7mXJPaxdTPGrha3rrqUrri7HSKb3T", kind: "wallet" },
   { id: "ore", x: 330, y: 120, w: 250, h: 170, title: "ORE program", addr: "oreV3EG1i9BEgiAJ8b177Z2S2rMarzak4NMv1kULvWv", kind: "program",
-    lines: ["Board: current round", "Round PDAs: 25 squares each", "Miner PDAs: per-wallet state", "Treasury: vaulted SOL, unclaimed ORE"] },
+    lines: ["Board: current round", "Round PDAs: 25 tiles each", "Miner PDAs: per-wallet state", "Treasury: vaulted SOL, unclaimed ORE"] },
   { id: "mint", x: 700, y: 20, w: 270, h: 58, title: "ORE mint program", addr: "mintzxW6Kckmeyh1h6Zfdj9QcYgCzhPSGiC8ChZ6fCx", kind: "program" },
   { id: "entropy", x: 700, y: 108, w: 270, h: 58, title: "Entropy program", addr: "3jSkUuYBoJzQPMEzTvkDFXCZUBksPamrVhrnHR9igu2X", kind: "program" },
   { id: "jup", x: 700, y: 196, w: 270, h: 58, title: "Jupiter v6", addr: "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4", kind: "program" },
@@ -25,7 +25,7 @@ const EDGES: { from: string; to: string; label: string; fy?: number; ty?: number
   { from: "crank", to: "ore", label: "reset", fy: 0.5, ty: 0.45 },
   { from: "bury", to: "ore", label: "buyback", fy: 0.5, ty: 0.85 },
   { from: "ore", to: "mint", label: "mint 1.2 ORE / round", fy: 0.08, ty: 0.5 },
-  { from: "ore", to: "entropy", label: "winning square", fy: 0.32, ty: 0.5 },
+  { from: "ore", to: "entropy", label: "winning tile", fy: 0.32, ty: 0.5 },
   { from: "ore", to: "jup", label: "swap SOL to ORE", fy: 0.62, ty: 0.5 },
   { from: "ore", to: "stake", label: "10% of bought ORE", fy: 0.9, ty: 0.5 },
 ];
@@ -54,7 +54,7 @@ export function ContractDiagram() {
         );
       })}
       <path d={`M455,290 L455,328`} stroke="#8d8693" strokeOpacity={0.7} markerEnd="url(#arr)" />
-      <text x={463} y={312} fill="#8d8693" fontSize={10.5}>1% of every square</text>
+      <text x={463} y={312} fill="#8d8693" fontSize={10.5}>1% of every tile</text>
       {BOXES.map((b) => (
         <a key={b.id} href={b.addr ? sol(b.addr) : undefined} target="_blank" rel="noreferrer">
           <rect x={b.x} y={b.y} width={b.w} height={b.h} rx={3} fill={b.kind === "program" ? "#1b1820" : "#131118"}
@@ -75,14 +75,14 @@ export const ENTRIES: Entry[] = [
   { name: "ORE mint", addr: "oreoU2P8bN6jkk3jbaiVxYnG1dCXcYxwhwyK9jSybcp", kind: "mint", role: "Token, 11 decimals, 3,000,000 max supply" },
   { name: "ORE mint program", addr: "mintzxW6Kckmeyh1h6Zfdj9QcYgCzhPSGiC8ChZ6fCx", kind: "program", role: "Only minter; enforces the supply cap" },
   { name: "ORE stake program", addr: "stakecNP3FpiExZPCgZfqRgumVzi6dNqnfrjwXyTgeH", kind: "program", role: "Receives 10% of bought-back ORE as staker yield" },
-  { name: "Entropy program", addr: "3jSkUuYBoJzQPMEzTvkDFXCZUBksPamrVhrnHR9igu2X", kind: "program", role: "Supplies the randomness that picks the winning square" },
+  { name: "Entropy program", addr: "3jSkUuYBoJzQPMEzTvkDFXCZUBksPamrVhrnHR9igu2X", kind: "program", role: "Supplies the randomness that picks the winning tile" },
   { name: "Board", addr: "BrcSxdp1nXFzou1YyDnQJcPNBNHgoypZmTsyKBSLLXzi", kind: "account", role: "Current round id and slot window" },
   { name: "Treasury", addr: "45db2FSR4mcXdSVVZbKbwojU6uYDpMyhpEi7cC8nHaWG", kind: "account", role: "Holds vaulted SOL and miners' unclaimed SOL" },
   { name: "Treasury wSOL", addr: "Ef4Bu9FQ8v8yV8HEKKfsb7W9XjYoyvCDhGVNVA3jkLzm", kind: "account", role: "SOL wrapped here right before each buyback swap" },
   { name: "Treasury ORE", addr: "GwZS8yBuPPkPgY4uh7eEhHN5EEdpkf7EBZ1za6nuP3wF", kind: "account", role: "Unclaimed mining rewards; bought ORE passes through here to be burned" },
   { name: "Stake treasury", addr: "F3ajpARUkbMnYsrbAmgnsjyp991DVbGYRzfaVXy1Dfvu", kind: "account", role: "Tracks total ORE staked" },
   { name: "Config", addr: "9c9X7aDRAF41faiDs94ELjT19UrGnn72wBW9hPsS4Awy", kind: "account", role: "Fee rates, round length, entropy source" },
-  { name: "Admin fee collector", addr: "DyB4Kv6V613gp2LWQTq1dwDYHGKuUEoDHnCouGUtxFiX", kind: "wallet", role: "Gets 1% of every square; in every Reset tx since round 42,531" },
+  { name: "Admin fee collector", addr: "DyB4Kv6V613gp2LWQTq1dwDYHGKuUEoDHnCouGUtxFiX", kind: "wallet", role: "Gets 1% of every tile; in every Reset tx since round 42,531" },
   { name: "Admin fee collector (old)", addr: "tHCCE3KWKx8i8cDjX2DQ3Z7EMJkScAVwkfxdWz8SqgP", kind: "wallet", role: "Same role, rounds 10,099 to 42,530" },
   { name: "Bury authority", addr: "HNWhK5f8RMWBqcA7mXJPaxdTPGrha3rrqUrri7HSKb3T", kind: "wallet", role: "Only signer allowed to run buybacks" },
 ];

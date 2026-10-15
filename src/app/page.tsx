@@ -80,11 +80,12 @@ export default function Page() {
         <section className="grid items-center gap-8 pt-12 pb-16 lg:grid-cols-[1.05fr_1fr] lg:pt-16">
           <div>
             <h1 className="wide-xl text-[40px] font-bold text-bone sm:text-[56px]">
-              {compact(T.deployedSol, 2)} SOL bet on a 5×5 grid, one minute at a time.
+              {compact(T.deployedSol, 2)} SOL deployed on a 5×5 grid, one minute at a time.
             </h1>
             <p className="mt-6 max-w-[58ch] text-[16px] leading-relaxed text-bone/80">
-              ORE is a mining game. Every minute miners spread SOL across 25 squares, one square wins, and the
-              protocol keeps 10% of the losing side. That cut buys ORE on the open market and burns it.
+              ORE is mined, not sold. Every minute miners spread SOL across 25 tiles and one tile wins the new ORE.
+              Miners get their SOL back minus a 1% fee, and minus 10% more on the losing tiles. That cut is the cost
+              of mining, and the protocol spends it buying ORE on the open market and burning it.
               Since round {n0(data.firstRound.id)} the treasury has bought {compact(bought)} ORE and burned {compact(T.buriedOre)},
               about {pct(burnShare, 0)} of everything mined in the same period.
             </p>
@@ -105,13 +106,13 @@ export default function Page() {
         </section>
 
         <Exhibit id="flow" n={1}
-          title={`Of every 100 SOL deployed, ${n1((toWinners / T.deployedSol) * 100)} go back to winners and ${n1((T.vaultedSol / T.deployedSol) * 100)} buy ORE`}
-          note={<>The protocol takes 10% of the SOL on the 24 losing squares, plus a 1% admin fee on every square. The rest is paid to miners on the winning square. Bought ORE is split 90% burned, 10% to stakers.</>}
+          title={`Of every 100 SOL deployed, ${n1((toWinners / T.deployedSol) * 100)} go back to miners and ${n1((T.vaultedSol / T.deployedSol) * 100)} buy ORE`}
+          note={<>A 1% admin fee comes off every tile and a 10% protocol fee off the 24 losing tiles, so miners get back 99% on the winning tile and 89.1% elsewhere. Earlier versions paid the losing tiles&apos; SOL to the winners instead; the protocol&apos;s cut was the same. Bought ORE is split 90% burned, 10% to stakers.</>}
           source={<>ResetEvent in every round&apos;s Reset transaction ({n0(T.rounds)} rounds) and BuryEvent in every buyback ({n0(T.buybacks)}), decoded from the ORE program&apos;s own logs.</>}>
           <div className="mb-2 flex justify-between text-[12px] text-ash"><span>{n0(T.deployedSol)} SOL deployed</span><span>100%</span></div>
           <div className="flex h-9 w-full overflow-hidden rounded-[3px]" role="img"
-            aria-label={`Deployed SOL split: ${pct(toWinners / T.deployedSol)} to winners, ${pct(T.vaultedSol / T.deployedSol)} to the treasury, ${pct(T.adminFeeSol / T.deployedSol)} admin fee`}>
-            <div className="flex items-center bg-steel/35 px-3 text-[12.5px] text-bone" style={{ width: pct(toWinners / T.deployedSol, 3) }}>Paid to winners, {pct(toWinners / T.deployedSol)}</div>
+            aria-label={`Deployed SOL split: ${pct(toWinners / T.deployedSol)} back to miners, ${pct(T.vaultedSol / T.deployedSol)} to the treasury, ${pct(T.adminFeeSol / T.deployedSol)} admin fee`}>
+            <div className="flex items-center bg-steel/35 px-3 text-[12.5px] text-bone" style={{ width: pct(toWinners / T.deployedSol, 3) }}>Returned to miners, {pct(toWinners / T.deployedSol)}</div>
             <div className="bg-copper" style={{ width: pct(T.vaultedSol / T.deployedSol, 3) }} />
             <div className="bg-ash/60" style={{ width: pct(T.adminFeeSol / T.deployedSol, 3) }} />
           </div>
@@ -125,7 +126,7 @@ export default function Page() {
               nodes={[
                 { id: "vault", col: 0, label: "Treasury vault", sub: `${n0(T.vaultedSol)} SOL`, color: "#d4894a" },
                 { id: "bb", col: 1, label: "Swapped for ORE", sub: `${n0(T.buybackSol)} SOL → ${n0(bought)} ORE`, color: "#d4894a", order: 0 },
-                { id: "wait", col: 1, label: "Waiting to be swapped", sub: `${n0(unswapped)} SOL`, color: "#7c4522", order: 1 },
+                { id: "wait", col: 1, label: "Not swapped", sub: `${n0(unswapped)} SOL, reserve and pending`, color: "#7c4522", order: 1 },
                 { id: "burn", col: 2, label: "Burned", sub: `${n0(T.buriedOre)} ORE`, color: "#e2603a", order: 0 },
                 { id: "stk", col: 2, label: "To stakers", sub: `${n0(T.sharedOre)} ORE`, color: "#f0b27a", order: 1 },
               ]}
@@ -138,7 +139,7 @@ export default function Page() {
           </div>
           <div className="mt-6 grid gap-x-8 sm:grid-cols-3">
             <Fig label="ORE minted to miners" value={n0(T.mintedOre)} sub="1 ORE per round + 0.2 to the motherlode pool" />
-            <Fig label="Motherlode jackpots" value={n0(T.motherlodeHits)} sub={`${n0(T.motherlodeOre)} ORE paid out, 1 in ${n0(T.rounds / T.motherlodeHits)} rounds`} />
+            <Fig label="Motherlode jackpots" value={n0(T.motherlodeHits)} sub={`${n0(T.motherlodeOre)} ORE paid out, once every ${n0(T.rounds / T.motherlodeHits)} rounds`} />
             <Fig label="ORE bought back" value={n0(bought)} sub={`${pct(bought / T.mintedOre, 0)} of ORE minted over the same rounds`} />
           </div>
         </Exhibit>
@@ -175,17 +176,17 @@ export default function Page() {
         </Exhibit>
 
         <Exhibit id="fairness" n={6}
-          title="Every square wins about as often as chance says it should"
-          note={<>Each cell counts the rounds that square won since round {n0(data.firstRound.id)}. With {n0(expected * 25)} rounds the expected count per square is {n0(expected)}. A chi-square test gives {data.squaresChi2} on 24 degrees of freedom, below the 36.4 threshold for 5% significance, so the spread is consistent with a fair draw.</>}
+          title="Every tile wins about as often as chance says it should"
+          note={<>Each cell counts the rounds that tile won since round {n0(data.firstRound.id)}. With {n0(expected * 25)} rounds the expected count per tile is {n0(expected)}. A chi-tile test gives {data.squaresChi2} on 24 degrees of freedom, below the 36.4 threshold for 5% significance, so the spread is consistent with a fair draw.</>}
           source={<>ResetEvent winning_square, rounds with SOL deployed and valid entropy.</>}>
           <div className="grid gap-8 sm:grid-cols-[minmax(0,420px)_1fr]">
             <div className="grid grid-cols-5 gap-1.5">
               {data.squares.map((w, i) => {
                 const dev = (w - expected) / expected;
                 return (
-                  <div key={i} className="flex aspect-square flex-col justify-between rounded-[3px] border border-line p-2"
+                  <div key={i} className="flex aspect-tile flex-col justify-between rounded-[3px] border border-line p-2"
                     style={{ background: `color-mix(in oklab, ${dev >= 0 ? "#d4894a" : "#8ea6be"} ${Math.min(Math.abs(dev) * 900, 60)}%, #131118)` }}
-                    title={`Square ${i + 1}: ${n0(w)} wins (${dev >= 0 ? "+" : ""}${(dev * 100).toFixed(2)}% vs expected)`}>
+                    title={`Tile ${i + 1}: ${n0(w)} wins (${dev >= 0 ? "+" : ""}${(dev * 100).toFixed(2)}% vs expected)`}>
                     <span className="text-[11px] text-ash">#{i + 1}</span>
                     <span className="wide text-[14px] font-semibold text-bone">{compact(w, 1)}</span>
                   </div>
@@ -205,7 +206,7 @@ export default function Page() {
                   ))}
                 </tbody>
               </table>
-              <p className="mt-3">The motherlode pool grows 0.2 ORE every round and pays out all at once. It holds {n1(L.motherlodePool)} ORE right now.</p>
+              <p className="mt-3">The motherlode pool grows 0.2 ORE every round and pays out all at once. It holds {n1(L.motherlodePool)} ORE right now. It has hit once every {n0(T.rounds / T.motherlodeHits)} rounds: the odds were 1 in 625 until ORE moved them to 1 in 500.</p>
             </div>
           </div>
         </Exhibit>
@@ -228,7 +229,7 @@ export default function Page() {
               <p>Every Reset transaction pays the 1% admin fee, so the full history of the{" "}
                 <a href={sol("DyB4Kv6V613gp2LWQTq1dwDYHGKuUEoDHnCouGUtxFiX")} className="underline">admin fee collector</a> is
                 one transaction per round. Each one carries the program&apos;s ResetEvent as a self-call, which gives SOL deployed,
-                SOL vaulted, winnings, ORE minted, the winning square and the miner count. {n0(T.rounds)} rounds, contiguous
+                SOL vaulted, winnings, ORE minted, the winning tile and the miner count. {n0(T.rounds)} rounds, contiguous
                 from {n0(data.firstRound.id)} to {n0(data.lastRound.id)}, no gaps.</p>
               <h3 className="mt-5 mb-2 font-semibold text-bone">Buybacks</h3>
               <p>Every buyback wraps SOL in the treasury&apos;s{" "}
@@ -238,15 +239,15 @@ export default function Page() {
             <div>
               <h3 className="mb-2 font-semibold text-bone">Checks</h3>
               <ul className="list-disc space-y-1.5 pl-5">
-                <li>SOL spent on buybacks ({n0(T.buybackSol)}) is {pct(T.buybackSol / T.vaultedSol)} of SOL vaulted ({n0(T.vaultedSol)}); the rest waits in the treasury.</li>
+                <li>SOL spent on buybacks ({n0(T.buybackSol)}) is {pct(T.buybackSol / T.vaultedSol)} of SOL vaulted ({n0(T.vaultedSol)}). The gap fits the 1% of revenue ORE says it sends to its Reserve, plus SOL waiting for the next swap.</li>
                 <li>Every BuryEvent shares exactly 10% of the bought ORE with stakers, as the program code says.</li>
                 <li>Staked ORE read from the stake treasury ({n0(L.stakedOre)}) matches ORE&apos;s own explore page.</li>
-                <li>Winning squares pass a chi-square uniformity test (Exhibit 6).</li>
+                <li>Winning tiles pass a chi-tile uniformity test (Exhibit 6).</li>
               </ul>
               <h3 className="mt-5 mb-2 font-semibold text-bone">Known limits</h3>
               <ul className="list-disc space-y-1.5 pl-5">
                 <li>Rounds 1 to {n0(data.firstRound.id - 1)} (launch week, before 2 Oct 2025) don&apos;t appear through either fee collector or the board account, so they aren&apos;t counted.</li>
-                <li>Older events reported winnings without the winning square&apos;s own stake, so the admin fee is computed from the code (1% of each square) rather than as a remainder.</li>
+                <li>Older events reported winnings without the winning tile&apos;s own stake, so the admin fee is computed from the code (1% of each tile) rather than as a remainder.</li>
                 <li>USD figures use one SOL/USD close per day, not the price at each round.</li>
                 <li>Individual Deploy transactions aren&apos;t pulled, so there&apos;s no count of unique miners across rounds.</li>
               </ul>
