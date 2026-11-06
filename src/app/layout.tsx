@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import Ask from "@/components/ask";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -17,7 +18,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
       </head>
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">{children}<Ask site="ore" title="ORE" suggestions={["How much SOL was deployed in the last 30 days?", "How much ORE has been bought back and buried?", "What’s the current ORE supply and price?"]} /></body>
     </html>
   );
 }
