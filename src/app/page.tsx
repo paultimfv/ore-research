@@ -1,11 +1,12 @@
 import { getData } from "@/lib/data";
+import { liveOre } from "@/lib/live";
 import { TimeChart } from "@/components/charts";
 import Spiral from "@/components/spiral";
 import ThemeToggle from "@/components/theme-toggle";
 import { AddressTable, FlowMap, Kpi, Panel, Section } from "@/components/ui";
 import { n0, pct, usd, compact, dayLabel } from "@/lib/fmt";
 
-export const revalidate = 300;
+export const revalidate = 60; // live supply / stake / treasury every minute; history from the hourly pipeline
 
 const A = {
   program: "oreV3EG1i9BEgiAJ8b177Z2S2rMarzak4NMv1kULvWv",
@@ -59,7 +60,7 @@ function TileGrid({ wins }: { wins: number[] }) {
 export default async function Page() {
   const data = await getData();
   const T = data.totals;
-  const L = data.live;
+  const L = await liveOre(data.live, data.generatedAt);
   const M = data.last30;
 
   const returned = T.deployedSol - T.vaultedSol - T.adminFeeSol;
@@ -85,7 +86,7 @@ export default async function Page() {
         </figure>
       </header>
 
-      <Section title="The seam today" sub="Supply, stake and treasury now; mining and revenue over the last 30 days.">
+      <Section title="The seam today" sub={`Supply, stake and treasury ${L.fresh ? `live from Solana, ${L.at.slice(11, 16)} UTC (refreshed every minute)` : `as of ${L.at.slice(0, 16).replace("T", " ")} UTC`}; mining and revenue over the last 30 days, through ${dayLabel(data.lastRound.date)} (updated hourly).`}>
         <div className="kpis grid grid-cols-2 md:grid-cols-4">
           <Kpi label="Market cap" value={usd((L.priceUsd ?? 0) * L.supply)} note="Circulating supply × last buyback price" />
           <Kpi label="Circulating supply" value={n0(L.supply)} note={`${pct(L.supply / L.maxSupply)} of 3M max`} />
@@ -187,7 +188,7 @@ export default async function Page() {
           <li>Rounds: the ORE program&apos;s reset event, decoded from every transaction to the <a className="underline" href={scan(A.admin)} target="_blank" rel="noreferrer">admin fee wallet</a> (and the <a className="underline" href={scan(A.adminOld)} target="_blank" rel="noreferrer">earlier one</a>). {n0(T.rounds)} rounds, {n0(data.firstRound.id)} to {n0(data.lastRound.id)}. Rounds before {n0(data.firstRound.id)} are not included.</li>
           <li>Buybacks: the ORE program&apos;s bury event, decoded from every transaction to the <a className="underline" href={scan(A.wsol)} target="_blank" rel="noreferrer">treasury wSOL account</a>. {n0(T.buybacks)} buybacks.</li>
           <li>Supply, staked ORE and treasury balance: read from the <a className="underline" href={scan(A.mint)} target="_blank" rel="noreferrer">mint</a>, <a className="underline" href={scan(A.stake)} target="_blank" rel="noreferrer">stake program</a> and <a className="underline" href={scan(A.treasury)} target="_blank" rel="noreferrer">treasury</a> accounts.</li>
-          <li>SOL/USD: Kraken daily close. Solana data via Alchemy RPC. Updated hourly.</li>
+          <li>SOL/USD: Kraken daily close. Solana data via Alchemy RPC. Supply, stake and treasury live (60 s); rounds and buybacks hourly.</li>
         </ul>
       </Section>
 
