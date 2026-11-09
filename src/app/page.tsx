@@ -1,17 +1,11 @@
-import data from "@/data/ore.json";
+import { getData } from "@/lib/data";
 import { TimeChart } from "@/components/charts";
 import Spiral from "@/components/spiral";
 import ThemeToggle from "@/components/theme-toggle";
 import { AddressTable, FlowMap, Kpi, Panel, Section } from "@/components/ui";
 import { n0, pct, usd, compact, dayLabel } from "@/lib/fmt";
 
-const T = data.totals;
-const L = data.live;
-const M = data.last30;
-
-const returned = T.deployedSol - T.vaultedSol - T.adminFeeSol;
-const daily = data.daily.slice(0, -1); // today is partial
-const weekly = data.weekly.slice(0, -1); // this week is partial
+export const revalidate = 300;
 
 const A = {
   program: "oreV3EG1i9BEgiAJ8b177Z2S2rMarzak4NMv1kULvWv",
@@ -62,7 +56,15 @@ function TileGrid({ wins }: { wins: number[] }) {
   );
 }
 
-export default function Page() {
+export default async function Page() {
+  const data = await getData();
+  const T = data.totals;
+  const L = data.live;
+  const M = data.last30;
+
+  const returned = T.deployedSol - T.vaultedSol - T.adminFeeSol;
+  const daily = data.daily.slice(0, -1); // today is partial
+  const weekly = data.weekly.slice(0, -1); // this week is partial
   return (
     <main className="mx-auto max-w-[1100px] px-4 pb-10 pt-5 sm:px-6">
       <div className="flex justify-end"><ThemeToggle /></div>
