@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Geologica } from "next/font/google";
 import Ask from "@/components/ask";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+// Geologica: a geological grotesk; its sharpness axis gives the big figures a cut, faceted edge
+const geo = Geologica({ subsets: ["latin"], axes: ["SHRP"], variable: "--font-geo" });
 
 export const metadata: Metadata = {
   title: "ORE dashboard",
@@ -14,7 +15,7 @@ const THEME_INIT = `try{var t=localStorage.getItem("theme");if(!t)t=matchMedia("
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={inter.variable} data-theme="dark" suppressHydrationWarning>
+    <html lang="en" className={geo.variable} data-theme="dark" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
       </head>

@@ -8,10 +8,10 @@ Live: https://ore-dashboard-beige.vercel.app
 
 | Data | Source | Refresh |
 |---|---|---|
-| Rounds (SOL deployed, treasury cut, ORE minted, winning tile, motherlode) | ORE program reset events, from transactions to the admin fee wallet, Helius RPC | daily |
-| Buybacks (SOL spent, ORE burned, ORE to stakers, supply) | ORE program bury events, from transactions to the treasury wSOL account, Helius RPC | daily |
-| Supply, staked ORE, treasury balance | Mint, stake and treasury accounts, Helius RPC | daily |
-| SOL/USD | Kraken daily close | daily |
+| Rounds (SOL deployed, treasury cut, ORE minted, winning tile, motherlode) | ORE program reset events, from transactions to the admin fee wallet, Helius RPC | hourly |
+| Buybacks (SOL spent, ORE burned, ORE to stakers, supply) | ORE program bury events, from transactions to the treasury wSOL account, Helius RPC | hourly |
+| Supply, staked ORE, treasury balance | Mint, stake and treasury accounts, Helius RPC | hourly |
+| SOL/USD | Kraken daily close | hourly |
 
 Addresses are listed on the dashboard and in `scripts/`. Method details: `PIPELINE.md`.
 

@@ -52,7 +52,7 @@ function TileGrid({ wins }: { wins: number[] }) {
       {wins.map((w, i) => {
         const dev = w / exp - 1;
         return (
-          <div key={i} className="rounded border border-line bg-bg px-1 py-2 text-center" title={`Tile ${i + 1}: ${n0(w)} wins`}>
+          <div key={i} className="tile px-1 py-2 text-center" style={{ ["--d" as string]: Math.max(0, Math.min(1, 0.5 + dev * 20)) }} title={`Tile ${i + 1}: ${n0(w)} wins`}>
             <div className="text-[13px] font-semibold text-text">{compact(w, 1)}</div>
             <div className={`text-[11px] ${dev >= 0 ? "text-accent" : "text-muted"}`}>{dev >= 0 ? "+" : ""}{(dev * 100).toFixed(1)}%</div>
           </div>
@@ -64,23 +64,28 @@ function TileGrid({ wins }: { wins: number[] }) {
 
 export default function Page() {
   return (
-    <main className="mx-auto max-w-[1100px] px-4 py-8 sm:px-6">
-      <header className="flex items-start justify-between gap-4 border-b border-line pb-5">
-        <div className="flex items-center gap-4">
-          <Spiral days={daily.map((d) => ({ d: d.d, deployed: d.deployed }))} size={72} />
-          <div>
-            <h1 className="text-[26px] font-semibold text-text">ORE</h1>
-            <p className="mt-0.5 text-[14px] text-muted">
-              Onchain data for <a className="underline" href="https://ore.com" target="_blank" rel="noreferrer">ORE</a> on Solana. Rounds {n0(data.firstRound.id)} to {n0(data.lastRound.id)}, {dayLabel(data.firstRound.date)} to {dayLabel(data.lastRound.date)}.
-            </p>
+    <main className="mx-auto max-w-[1100px] px-4 pb-10 pt-5 sm:px-6">
+      <div className="flex justify-end"><ThemeToggle /></div>
+      <header className="grid items-center gap-x-12 gap-y-6 md:grid-cols-[minmax(0,1fr)_auto]">
+        <div>
+          <h1 className="page-t">ORE</h1>
+          <div className="mt-6 flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <span className="assay">${(L.priceUsd ?? 0).toFixed(2)}</span>
+            <span className="text-[14px] text-muted">{(L.priceSol ?? 0).toFixed(3)} SOL at the last buyback</span>
           </div>
+          <p className="mt-5 max-w-[56ch] text-[15px] leading-relaxed text-muted">
+            Onchain data for <a className="underline" href="https://ore.com" target="_blank" rel="noreferrer">ORE</a> on Solana. Rounds {n0(data.firstRound.id)} to {n0(data.lastRound.id)}, {dayLabel(data.firstRound.date)} to {dayLabel(data.lastRound.date)}.
+          </p>
         </div>
-        <ThemeToggle />
+        <figure className="m-0 justify-self-center">
+          <Spiral days={daily.map((d) => ({ d: d.d, deployed: d.deployed }))} size={300} />
+          <figcaption className="mt-1 text-center text-[12px] text-muted">Every day of mining, oldest at the centre. Longer ticks, more SOL deployed.</figcaption>
+        </figure>
       </header>
 
-      <Section title="Key numbers">
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-          <Kpi label="ORE price" value={`$${(L.priceUsd ?? 0).toFixed(2)}`} note={`${(L.priceSol ?? 0).toFixed(3)} SOL, last buyback`} />
+      <Section title="The seam today" sub="Supply, stake and treasury now; mining and revenue over the last 30 days.">
+        <div className="kpis grid grid-cols-2 md:grid-cols-4">
+          <Kpi label="Market cap" value={usd((L.priceUsd ?? 0) * L.supply)} note="Circulating supply × last buyback price" />
           <Kpi label="Circulating supply" value={n0(L.supply)} note={`${pct(L.supply / L.maxSupply)} of 3M max`} />
           <Kpi label="Staked ORE" value={n0(L.stakedOre)} note={`${pct(L.stakedOre / L.supply)} of supply`} />
           <Kpi label="Treasury SOL" value={n0(L.treasurySol)} note="Awaiting buyback" />
@@ -114,8 +119,8 @@ export default function Page() {
           ]} />
       </Section>
 
-      <Section title="Charts">
-        <div className="grid gap-4 md:grid-cols-2">
+      <Section title="Over time">
+        <div className="grid gap-x-8 gap-y-12 md:grid-cols-2">
           <Panel title="SOL deployed per day" source={SRC.rounds}>
             <TimeChart rows={daily.map((d) => ({ d: d.d, v: d.deployed }))} unit="SOL"
               series={[{ key: "v", name: "SOL deployed", color: "var(--accent2)", type: "bar" }]} />
@@ -151,10 +156,10 @@ export default function Page() {
       </Section>
 
       <Section title="Largest motherlode hits">
-        <div className="overflow-x-auto rounded-lg border border-line">
-          <table className="w-full min-w-[520px] text-left text-[14px]">
-            <thead className="bg-panel text-muted">
-              <tr><th className="px-4 py-2 font-normal">Round</th><th className="px-4 py-2 font-normal">Date</th><th className="px-4 py-2 text-right font-normal">ORE</th><th className="px-4 py-2 text-right font-normal">Miners</th><th className="px-4 py-2 text-right font-normal">SOL deployed</th></tr>
+        <div className="fig overflow-x-auto">
+          <table className="num w-full min-w-[520px] text-left text-[14px]">
+            <thead className="text-muted">
+              <tr className="border-b border-text"><th className="px-4 py-2 font-normal">Round</th><th className="px-4 py-2 font-normal">Date</th><th className="px-4 py-2 text-right font-normal">ORE</th><th className="px-4 py-2 text-right font-normal">Miners</th><th className="px-4 py-2 text-right font-normal">SOL deployed</th></tr>
             </thead>
             <tbody>
               {data.motherlodes.slice(0, 8).map((m) => (
@@ -180,11 +185,11 @@ export default function Page() {
           <li>Rounds: the ORE program&apos;s reset event, decoded from every transaction to the <a className="underline" href={scan(A.admin)} target="_blank" rel="noreferrer">admin fee wallet</a> (and the <a className="underline" href={scan(A.adminOld)} target="_blank" rel="noreferrer">earlier one</a>). {n0(T.rounds)} rounds, {n0(data.firstRound.id)} to {n0(data.lastRound.id)}. Rounds before {n0(data.firstRound.id)} are not included.</li>
           <li>Buybacks: the ORE program&apos;s bury event, decoded from every transaction to the <a className="underline" href={scan(A.wsol)} target="_blank" rel="noreferrer">treasury wSOL account</a>. {n0(T.buybacks)} buybacks.</li>
           <li>Supply, staked ORE and treasury balance: read from the <a className="underline" href={scan(A.mint)} target="_blank" rel="noreferrer">mint</a>, <a className="underline" href={scan(A.stake)} target="_blank" rel="noreferrer">stake program</a> and <a className="underline" href={scan(A.treasury)} target="_blank" rel="noreferrer">treasury</a> accounts.</li>
-          <li>SOL/USD: Kraken daily close. Solana data via Helius RPC. Updated daily.</li>
+          <li>SOL/USD: Kraken daily close. Solana data via Alchemy RPC. Updated hourly.</li>
         </ul>
       </Section>
 
-      <footer className="mt-12 border-t border-line pt-5 text-[13px] text-muted">
+      <footer className="mt-16 border-t-2 border-text pt-5 text-[13px] text-muted">
         By <a className="underline" href="https://paultimofeev.com">Paul Timofeev</a>. Not affiliated with ORE.
       </footer>
     </main>

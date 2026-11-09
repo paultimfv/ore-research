@@ -11,12 +11,12 @@ so the revenue, burn and supply numbers come straight from the chain.
 ## The picture
 
 ```
- SOURCES                                   PIPELINE (Python, daily on GitHub)         DASHBOARD (Next.js on Vercel)
+ SOURCES                                   PIPELINE (Python, hourly on GitHub)         DASHBOARD (Next.js on Vercel)
 
- Helius getTransactionsForAddress
+ Alchemy getTransactionsForAddress
    admin fee collector (1 tx per round) ─► pull_rounds.py ─► data/raw/rounds/YYYY-MM.csv ┐
    treasury wSOL account (every buyback)─► pull_buybacks.py ─► data/raw/buybacks.csv     ├► build_ore.py ─► src/data/ore.json
- Helius getAccountInfo (supply, treasury, stake, board) ────────────────────────────────┤
+ Alchemy getAccountInfo (supply, treasury, stake, board) ────────────────────────────────┤
  Kraken SOL/USD daily close ────────────────────────────────────────────────────────────┘
 ```
 

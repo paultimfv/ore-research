@@ -1,7 +1,7 @@
-name: daily refresh
+name: hourly refresh
 on:
   schedule:
-    - cron: "30 6 * * *"     # 06:30 UTC
+    - cron: "20 * * * *"     # hourly, :20 past
   workflow_dispatch:
 concurrency: daily
 permissions:
@@ -19,6 +19,7 @@ jobs:
         working-directory: scripts
         env:
           HELIUS_KEY: ${{ secrets.HELIUS_KEY }}
+          ALCHEMY_KEY: ${{ secrets.ALCHEMY_KEY }}
         run: |
           python -u pull_rounds.py
           python -u pull_buybacks.py
@@ -29,5 +30,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
           git add data/raw src/data
-          git diff --cached --quiet || git commit -m "data: daily refresh $(date -u +%F)"
+          git diff --cached --quiet || git commit -m "data: refresh $(date -u +%FT%H:%MZ)"
           git push
