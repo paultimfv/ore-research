@@ -3,6 +3,7 @@
 Inputs:  data/raw/rounds/*.csv (one row per round), data/raw/buybacks.csv (one row per buyback)
 Live:    mint supply, treasury, staking and board accounts via RPC; SOL/USD daily closes from Kraken.
 """
+import time
 import csv, json, glob, math, struct, base64, datetime as dt, time
 from collections import defaultdict
 import requests
@@ -41,8 +42,14 @@ def load_rounds():
 
 
 def sol_usd():
-    r = requests.get("https://api.kraken.com/0/public/OHLC",
-                     params={"pair": "SOLUSD", "interval": 1440, "since": 1756684800}, timeout=30).json()
+    for i in range(4):   # Kraken occasionally times out; retry before failing the run
+        try:
+            r = requests.get("https://api.kraken.com/0/public/OHLC",
+                             params={"pair": "SOLUSD", "interval": 1440, "since": 1756684800}, timeout=30).json()
+            break
+        except requests.RequestException:
+            if i == 3: raise
+            time.sleep(10 * (i + 1))
     k = next(iter(r["result"].keys() - {"last"}))
     return {day(c[0]): float(c[4]) for c in r["result"][k]}
 
